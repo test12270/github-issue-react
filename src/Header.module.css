@@ -18,4 +18,5 @@
   display: flex;
   margin-bottom: 20px;
   justify-content: flex-end;
+  margin-left: auto;
 }

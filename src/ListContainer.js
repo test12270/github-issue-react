@@ -1,106 +1,76 @@
 import styles from "./ListContainer.module.css";
-import Button from "./components/Button";
 import Listitem from "./components/Listitem";
 import { useState } from "react";
 import ListitemLayout from "./components/ListitemLayout";
-import cx from "clsx";
-import Modal from "./components/Modal";
+import Pagination from "./components/Pagination";
+import ListFilter from "./ListFilter";
+import OpenClosedFilters from "./OpenClosedFilters";
+import IssueButton from "./components/IssueButton";
+import axios from "axios";
+import { useEffect } from "react";
+import { GITHUB_API } from "./api";
 
 export default function ListContainer() {
   const [inputValue, setInputValue] = useState("is:pr is:open");
+  const [list, setList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [checked, setChecked] = useState(false);
+  const [isOpenMode, setIsOpenMode] = useState(true);
+  const [params, setParams] = useState();
+  const maxPage = 10;
+
+  async function getData(params) {
+    const { data } = await axios.get(
+      `${GITHUB_API}/repos/facebook/react/issues`,
+      { params: params }
+    );
+    setList(data);
+    console.log(data);
+  }
+  useEffect(() => {
+    getData({ page, state: isOpenMode ? "open" : "closed", ...params });
+  }, [page, isOpenMode, params]);
 
   return (
-    <div className={styles.listContainer}>
-      <div className={styles.topSection}>
-        <input
-          className={styles.input}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        ></input>
-        <Button
-          style={{ fontSize: "14px", backgroundColor: "green", color: "white" }}
-        >
-          New Issue
-        </Button>
+    <>
+      <div className={styles.listContainer}>
+        <div className={styles.topSection}>
+          <input
+            className={styles.input}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          ></input>
+          <IssueButton>New Issue</IssueButton>
+        </div>
+        <OpenClosedFilters
+          isOpenMode={isOpenMode}
+          onClickMode={setIsOpenMode}
+        />
+        <ListitemLayout className={styles.listFilter}>
+          <ListFilter
+            onChangeFilter={(params) => {
+              setParams(params);
+            }}
+          />
+        </ListitemLayout>
+        <div className={styles.container}>
+          {list.map((item) => (
+            <Listitem
+              key={item.id}
+              data={item}
+              checked={checked}
+              onChangeCheckBox={() => setChecked((checked) => !checked)}
+            />
+          ))}
+        </div>
       </div>
-      <OpenClosedFilters />
-      <ListitemLayout className={styles.listFilter}>
-        <ListFilter />
-      </ListitemLayout>
-      <div className={styles.container}>
-        <Listitem
-          badges={[
-            {
-              color: "red",
-              title: "bug",
-            },
-          ]}
+      <div className={styles.paginationContainer}>
+        <Pagination
+          maxPage={maxPage}
+          currentPage={page}
+          onClickPageButton={(number) => setPage(number)}
         />
       </div>
-    </div>
-  );
-}
-
-function ListFilter() {
-  const [showModal, setShowModal] = useState(false);
-  return (
-    <>
-      <div className={styles.filterLists}>
-        <ListFilterItem onClick={() => setShowModal(true)}>
-          Author
-        </ListFilterItem>
-        <ListFilterItem>Label</ListFilterItem>
-        <ListFilterItem>Projects</ListFilterItem>
-        <ListFilterItem>Milestones</ListFilterItem>
-        <ListFilterItem>Assignee</ListFilterItem>
-        <ListFilterItem>Sort</ListFilterItem>
-      </div>
-      <Modal
-        opened={showModal}
-        onClose={() => setShowModal(false)}
-        placeholder="Filter lables"
-      />
     </>
-  );
-}
-
-function ListFilterItem({ onClick, children }) {
-  return (
-    <span role="button" onClick={onClick}>
-      {children} ▼
-    </span>
-  );
-}
-
-function OpenClosedFilters({ data }) {
-  const [isOpenMode, setIsOpenMode] = useState(true);
-
-  const openModeDataSize = 1;
-  const closeModeDataSize = 2;
-  return (
-    <>
-      <OpenClosedFilter
-        size={openModeDataSize}
-        state="Open"
-        selected={isOpenMode}
-        onClick={() => setIsOpenMode(true)}
-      />
-      <OpenClosedFilter
-        size={closeModeDataSize}
-        state="Closed"
-        selected={!isOpenMode}
-        onClick={() => setIsOpenMode(false)}
-      />
-    </>
-  );
-}
-function OpenClosedFilter({ size, state, onClick, selected }) {
-  return (
-    <span
-      className={cx(styles.textFilter, { [styles.selected]: selected })}
-      onClick={onClick}
-    >
-      {size} {state}
-    </span>
   );
 }

@@ -1,7 +1,6 @@
 .listContainer {
   padding: 0 32px;
   margin-top: 24px;
-  height: 220px;
 }
 .topSection {
   display: flex;
@@ -25,26 +24,8 @@
   border-top-right-radius: 6px;
   background: rgb(246, 249, 250);
 }
-.filterLists {
+
+.paginationContainer {
   display: flex;
-  align-items: center;
-  font-weight: bold;
-}
-
-.filterLists > span {
-  padding: 0 16px;
-  line-height: 21px;
-  cursor: pointer;
-  color: #57606a;
-}
-
-.filterLists > span:hover {
-  color: #000000;
-}
-.textFilter {
-  margin-right: 8px;
-  cursor: pointer;
-}
-.selected {
-  font-weight: bold;
+  justify-content: center;
 }

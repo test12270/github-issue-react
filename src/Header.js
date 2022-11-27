@@ -1,42 +1,20 @@
 import styles from "./Header.module.css";
-import Button from "./components/Button";
 import Space from "./components/Space";
 import Tabs from "./components/Tab";
+import HeaderButton from "./components/HeaderButton";
 
 export default function Header() {
   return (
     <>
       <div className={styles.header}>
         <div className={styles.buttonContainer}>
-          <Button
-            style={{
-              fontSize: "14px",
-              backgroundColor: "transparent",
-              color: "black",
-            }}
-          >
-            Watch
-          </Button>
+          <HeaderButton>Watch</HeaderButton>
           <Space />
-          <Button
-            style={{
-              fontSize: "14px",
-              backgroundColor: "transparent",
-              color: "black",
-            }}
-          >
+          <HeaderButton>
             Fork <div className={styles.circle}>5</div>
-          </Button>
+          </HeaderButton>
           <Space />
-          <Button
-            style={{
-              fontSize: "14px",
-              backgroundColor: "transparent",
-              color: "black",
-            }}
-          >
-            Star
-          </Button>
+          <HeaderButton>Star</HeaderButton>
         </div>
       </div>
       <Tabs title="title" number={5} />

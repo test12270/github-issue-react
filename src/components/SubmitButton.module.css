@@ -1,0 +1,10 @@
+.IssueButton {
+  font-size: 14px;
+  background-color: green;
+  color: white;
+  padding: 5px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(27, 31, 36, 0.15);
+  display: flex;
+  align-items: center;
+}

@@ -1,4 +1,5 @@
 import styles from "./ListContainer.module.css";
+import { useSearchParams } from "react-router-dom";
 import Listitem from "./components/Listitem";
 import { useState } from "react";
 import ListitemLayout from "./components/ListitemLayout";
@@ -9,15 +10,21 @@ import IssueButton from "./components/IssueButton";
 import axios from "axios";
 import { useEffect } from "react";
 import { GITHUB_API } from "./api";
+import { Link } from "react-router-dom";
 
 export default function ListContainer() {
   const [inputValue, setInputValue] = useState("is:pr is:open");
   const [list, setList] = useState([]);
-  const [page, setPage] = useState(1);
+
   const [checked, setChecked] = useState(false);
   const [isOpenMode, setIsOpenMode] = useState(true);
   const [params, setParams] = useState();
   const maxPage = 10;
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = parseInt(searchParams.get("page") ?? 1, 10);
+  const state = searchParams.get("state");
 
   async function getData(params) {
     const { data } = await axios.get(
@@ -25,11 +32,10 @@ export default function ListContainer() {
       { params: params }
     );
     setList(data);
-    console.log(data);
   }
   useEffect(() => {
-    getData({ page, state: isOpenMode ? "open" : "closed", ...params });
-  }, [page, isOpenMode, params]);
+    getData(searchParams);
+  }, [searchParams]);
 
   return (
     <>
@@ -40,16 +46,18 @@ export default function ListContainer() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           ></input>
-          <IssueButton>New Issue</IssueButton>
+          <Link to="/new" className={styles.Link}>
+            <IssueButton>New Issue</IssueButton>
+          </Link>
         </div>
         <OpenClosedFilters
-          isOpenMode={isOpenMode}
-          onClickMode={setIsOpenMode}
+          isOpenMode={state !== "closed"}
+          onClickMode={(state) => setSearchParams({ state })}
         />
         <ListitemLayout className={styles.listFilter}>
           <ListFilter
             onChangeFilter={(params) => {
-              setParams(params);
+              setSearchParams(params);
             }}
           />
         </ListitemLayout>
@@ -68,7 +76,9 @@ export default function ListContainer() {
         <Pagination
           maxPage={maxPage}
           currentPage={page}
-          onClickPageButton={(number) => setPage(number)}
+          onClickPageButton={(pageNumber) =>
+            setSearchParams({ page: pageNumber })
+          }
         />
       </div>
     </>

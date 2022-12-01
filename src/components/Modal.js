@@ -11,7 +11,7 @@ export default function Modal({
 }) {
   const [serachValue, setSearchValue] = useState("");
   const [filteredData, setFilteredData] = useState(searchDataList);
-
+  // console.log({ onClickcell });
   useEffect(() => {
     setFilteredData(searchDataList);
   }, [searchDataList]);
